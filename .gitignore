@@ -1,3 +1,4 @@
 *.gem
 *.tar.gz
-
+gitlab/
+srv/
