@@ -3,34 +3,42 @@ version: '2'
 services:
   redis:
     restart: always
+    privileged: true
     image: sameersbn/redis:latest
     command:
     - --loglevel warning
     volumes:
-    - /srv/docker/gitlab/redis:/var/lib/redis:Z
+    - ./srv/docker/gitlab/redis:/var/lib/redis:Z
+    networks:
+    - web
 
   postgresql:
     restart: always
+    privileged: true
     image: sameersbn/postgresql:9.6-2
     volumes:
-    - /srv/docker/gitlab/postgresql:/var/lib/postgresql:Z
+    - ./gitlab/postgresql:/var/lib/postgresql:Z
     environment:
     - DB_USER=gitlab
-    - DB_PASS=password
+    - DB_PASS=V9c1u691d6
     - DB_NAME=gitlabhq_production
     - DB_EXTENSION=pg_trgm
+    networks:
+      - web
 
   gitlab:
     restart: always
+    privileged: true
     image: sameersbn/gitlab:10.8.3-1
     depends_on:
     - redis
     - postgresql
     ports:
     - "10080:80"
+    - "10443:443"
     - "10022:22"
     volumes:
-    - /srv/docker/gitlab/gitlab:/home/git/data:Z
+    - ./gitlab/gitlab:/home/git/data:Z
     environment:
     - DEBUG=false
 
@@ -38,53 +46,54 @@ services:
     - DB_HOST=postgresql
     - DB_PORT=5432
     - DB_USER=gitlab
-    - DB_PASS=password
+    - DB_PASS=V9c1u691d6
     - DB_NAME=gitlabhq_production
 
     - REDIS_HOST=redis
     - REDIS_PORT=6379
 
-    - TZ=Asia/Kolkata
-    - GITLAB_TIMEZONE=Kolkata
+    - TZ=Asia/Beijing 
+    - GITLAB_TIMEZONE=Beijing
 
     - GITLAB_HTTPS=false
     - SSL_SELF_SIGNED=false
 
-    - GITLAB_HOST=localhost
+    - GITLAB_HOST=172.16.13.75
     - GITLAB_PORT=10080
     - GITLAB_SSH_PORT=10022
-    - GITLAB_RELATIVE_URL_ROOT=
+    - GITLAB_EXTERNAL_URL=/gitlab
+    - GITLAB_RELATIVE_URL_ROOT=/gitlab
     - GITLAB_SECRETS_DB_KEY_BASE=long-and-random-alphanumeric-string
     - GITLAB_SECRETS_SECRET_KEY_BASE=long-and-random-alphanumeric-string
     - GITLAB_SECRETS_OTP_KEY_BASE=long-and-random-alphanumeric-string
 
     - GITLAB_ROOT_PASSWORD=
-    - GITLAB_ROOT_EMAIL=
+    - GITLAB_ROOT_EMAIL=chen.wei.yanfa@vpclub.cn
 
     - GITLAB_NOTIFY_ON_BROKEN_BUILDS=true
     - GITLAB_NOTIFY_PUSHER=false
 
-    - GITLAB_EMAIL=notifications@example.com
-    - GITLAB_EMAIL_REPLY_TO=noreply@example.com
-    - GITLAB_INCOMING_EMAIL_ADDRESS=reply@example.com
+    - GITLAB_EMAIL=chen.wei.yanfa@vpclub.cn
+    - GITLAB_EMAIL_REPLY_TO=noreply@vpclub.cn
+    - GITLAB_INCOMING_EMAIL_ADDRESS=reply@vpclub.cn
 
     - GITLAB_BACKUP_SCHEDULE=daily
     - GITLAB_BACKUP_TIME=01:00
 
-    - SMTP_ENABLED=false
-    - SMTP_DOMAIN=www.example.com
-    - SMTP_HOST=smtp.gmail.com
-    - SMTP_PORT=587
-    - SMTP_USER=mailer@example.com
-    - SMTP_PASS=password
+    - SMTP_ENABLED=true
+    - SMTP_DOMAIN=vpclub.cn
+    - SMTP_HOST=smtp.exmail.qq.com
+    - SMTP_PORT=465
+    - SMTP_USER=chen.wei.yanfa@vpclub.cn
+    - SMTP_PASS=CHw*0717.
     - SMTP_STARTTLS=true
     - SMTP_AUTHENTICATION=login
 
     - IMAP_ENABLED=false
-    - IMAP_HOST=imap.gmail.com
+    - IMAP_HOST=imap.qq.com
     - IMAP_PORT=993
-    - IMAP_USER=mailer@example.com
-    - IMAP_PASS=password
+    - IMAP_USER=chen.wei.yanfa@vpclub.cn
+    - IMAP_PASS=CHw*0717.
     - IMAP_SSL=true
     - IMAP_STARTTLS=false
 
@@ -148,3 +157,15 @@ services:
     - OAUTH_AZURE_API_KEY=
     - OAUTH_AZURE_API_SECRET=
     - OAUTH_AZURE_TENANT_ID=
+    networks:
+    - web
+    labels:
+    - "traefik.enable=true"
+    - "traefik.backend=gitlab"
+    - "traefik.frontend.rule=Host:gl.vpclub.cn"
+    - "traefik.port=80"
+
+
+networks:
+  web:
+    external: true
