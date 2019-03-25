@@ -1,0 +1,21 @@
+version: '2'
+services:
+  gitlab-runner:
+    restart: always
+    image: gitlab/gitlab-runner:latest
+    privileged: true
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./srv/gitlab-runner/config:/etc/gitlab-runner
+#    - ./git-runner:/home/gitlab-runner
+    
+  gitlab-docker-runner:
+    restart: always
+    image: gitlab/gitlab-runner:latest
+    privileged: true
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./srv/gitlab-runner/config:/etc/gitlab-runner
+#    - ./git-runner:/home/gitlab-runner
+    - ./run.sh:/run.sh
+#    command: ["./run.sh"] 

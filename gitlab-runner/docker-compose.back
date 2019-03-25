@@ -1,0 +1,18 @@
+version: '2'
+services:
+  gitlab-runner:
+    restart: always
+    image: gitlab/gitlab-runner:latest
+    network_mode: host
+    privileged: true
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ./srv/gitlab-runner/config:/etc/gitlab-runner
+    - ./git-runner:/home/gitlab-runner
+    environment:
+    - CI_SERVER_URL=http://172.16.13.75:10080/gitlab/
+    - RUNNER_TOKEN=fT4VcuhkXvShm8gK9go2
+    - RUNNER_DESCRIPTION=testrunner
+    - RUNNER_EXECUTOR=shell
+#   gitlab-docker-runner:
+    

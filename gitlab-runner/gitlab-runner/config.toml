@@ -1,0 +1,10 @@
+concurrent = 1
+
+[[runners]]
+  name = "testrunner"
+  url = "http://172.16.13.75:10080/gitlab/"
+  token = "fT4VcuhkXvShm8gK9go2"
+  limit = 2
+  executor = "shell"
+  builds_dir = ""
+  shell = "bash"
